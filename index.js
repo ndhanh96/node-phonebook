@@ -85,6 +85,8 @@ app.post('/api/persons', (req, res) => {
     persons.push({id:randomnumber, name: body.name, number: body.number});
     
     console.log(persons);
+    res.json(persons);
+    res.end();
 });
 
 app.get("/info", (req, res) => {
