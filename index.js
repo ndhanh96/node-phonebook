@@ -1,7 +1,31 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require('cors');
+const mysql = require('mysql');
 const app = express();
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
+let persons = [];
+const connection = mysql.createConnection({
+  host: process.env.MYSQL_HOST,
+  user: 'root',
+  password: process.env.MYSQL_PASSWORD_CONNECT,
+  database: 'users'
+});
+
+connection.connect();
+
+connection.query('SELECT * FROM Persons', function(err, rows, fields) {
+  if (err) throw err;
+  persons = rows;
+  console.log(rows);
+})
+
+connection.end()
+
 
 morgan.token("content", (req, res) => {
   return req.body.number && req.body.name
@@ -17,28 +41,7 @@ app.use(
 app.use(express.json());
 app.use(cors());
 
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hallas",
-    number: 4374534,
-  },
-  {
-    id: 2,
-    name: "Ada LoveLace",
-    number: 36547564,
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: 6584236,
-  },
-  {
-    id: 4,
-    name: "Mary Poppendick",
-    number: 12543325234,
-  },
-];
+
 
 app.get("/api/persons", (req, res) => {
   console.log(persons);
