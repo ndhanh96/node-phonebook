@@ -1,31 +1,22 @@
 const express = require("express");
 const morgan = require("morgan");
-const cors = require('cors');
-const mysql = require('mysql');
+const cors = require("cors");
+const mysql = require("mysql");
 const app = express();
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
 }
 
 let persons = [];
 const connection = mysql.createConnection({
   host: process.env.MYSQL_HOST,
-  user: 'root',
+  user: "root",
   password: process.env.MYSQL_PASSWORD_CONNECT,
-  database: 'users'
+  database: "users",
 });
 
 connection.connect();
-
-connection.query('SELECT * FROM Persons', function(err, rows, fields) {
-  if (err) throw err;
-  persons = rows;
-  console.log(rows);
-})
-
-connection.end()
-
 
 morgan.token("content", (req, res) => {
   return req.body.number && req.body.name
@@ -41,9 +32,12 @@ app.use(
 app.use(express.json());
 app.use(cors());
 
-
-
 app.get("/api/persons", (req, res) => {
+  connection.query("SELECT * FROM Persons", function (err, rows, fields) {
+    if (err) throw err;
+    persons = rows;
+    console.log(rows);
+  });
   console.log(persons);
   res.json(persons);
 });
@@ -83,7 +77,7 @@ app.post("/api/persons", (req, res) => {
   let randomnumber = Math.floor(Math.random() * Math.floor(10)) + maxnumber;
   if (persons.find((p) => p.id === randomnumber)) {
     console.log(randomnumber);
-    res.status(404).end();
+    res.status(404).json({ error: "duplicate id, try again!!!" });
     return;
   }
 
@@ -102,6 +96,11 @@ app.post("/api/persons", (req, res) => {
   }
 
   persons.push({ id: randomnumber, name: body.name, number: body.number });
+  sql = `INSERT INTO Persons(id, name, number) VALUES ('${randomnumber}', '${body.name}', '${body.number}')`;
+  connection.query(sql, (err, res) => {
+    if (err) throw err;
+    console.log("add to data");
+  });
 
   console.log(persons);
   res.json(persons);
