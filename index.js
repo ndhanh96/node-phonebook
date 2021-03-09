@@ -36,20 +36,25 @@ app.get("/api/persons", (req, res) => {
   connection.query("SELECT * FROM Persons", function (err, rows, fields) {
     if (err) throw err;
     persons = rows;
-    console.log(rows);
+    res.json(persons);
   });
   console.log(persons);
-  res.json(persons);
+  
 });
 
 app.get("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
   const person = persons.find((p) => p.id === id);
+  sql = `SELECT * FROM Persons WHERE id='${id}'`;
 
   if (person) {
-    res.json(person);
+    // res.json(person);
+    connection.query(sql, (err, rows) => {
+      if (err) throw err;
+      res.json(rows);
+    });
   } else {
-    res.status(404).end();
+    res.status(404).send('great things come for those who are stupid enough to believe it!!');
   }
 });
 
@@ -68,7 +73,8 @@ app.delete("/api/delete/:id", (req, res) => {
     connection.query(sql, (err,res) => {
       if (err) throw err;
       console.log("Delete record ", id);
-    })
+      console.log(res);
+    });
     res.json(persons);
   }
 });
