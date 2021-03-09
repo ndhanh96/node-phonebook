@@ -74,7 +74,8 @@ app.delete("/api/delete/:id", (req, res) => {
 
 app.post("/api/persons", (req, res) => {
   const maxnumber = Math.max(...persons.map((p) => p.id));
-  let randomnumber = Math.floor(Math.random() * Math.floor(10)) + maxnumber;
+  // let randomnumber = Math.floor(Math.random() * Math.floor(10)) + maxnumber;
+  let randomnumber = maxnumber + 1;
   if (persons.find((p) => p.id === randomnumber)) {
     console.log(randomnumber);
     res.status(404).json({ error: "duplicate id, try again!!!" });
@@ -103,7 +104,7 @@ app.post("/api/persons", (req, res) => {
   });
 
   console.log(persons);
-  res.json(persons);
+  res.json({ id: randomnumber, name: body.name, number: Number(body.number) });
   res.end();
 });
 
