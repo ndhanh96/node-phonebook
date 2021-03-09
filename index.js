@@ -57,10 +57,6 @@ app.delete("/api/delete/:id", (req, res) => {
   const id = Number(req.params.id);
   const person = persons.filter((p) => p.id !== id);
   console.log(persons);
-  console.log(
-    "check",
-    persons.find((p) => p.id === id)
-  );
 
   if (persons.find((p) => p.id === id) == undefined) {
     return res.status(404).end();
@@ -68,6 +64,11 @@ app.delete("/api/delete/:id", (req, res) => {
 
   if (person) {
     persons = person;
+    const sql = `DELETE FROM Persons WHERE id = '${id}'`;
+    connection.query(sql, (err,res) => {
+      if (err) throw err;
+      console.log("Delete record ", id);
+    })
     res.json(persons);
   }
 });
